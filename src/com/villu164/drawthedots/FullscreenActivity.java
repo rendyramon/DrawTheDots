@@ -55,11 +55,12 @@ public class FullscreenActivity extends Activity {
 	private SystemUiHider mSystemUiHider;
 	
 	private SignatureView sig_view;
+	private DatabaseHandler db;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		setContentView(R.layout.activity_fullscreen);
 
 		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.felt2);
@@ -72,7 +73,10 @@ public class FullscreenActivity extends Activity {
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
-
+		db = new DatabaseHandler(this);
+		sig_view.init_db(db);
+		//db.onUpgrade(db.getWritableDatabase(), 0, 1);
+		System.out.println(db.getPathsCount());
 	}
 
 	
@@ -91,6 +95,6 @@ public class FullscreenActivity extends Activity {
 	public void nextStep(View view){
 		//R.id.signatureView1
 		
-		sig_view.make_dots();
+		//sig_view.make_dots();
 	}
 }

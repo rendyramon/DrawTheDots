@@ -1,6 +1,6 @@
 package com.villu164.drawthedots;
 //originally taken from http://corner.squareup.com/2010/07/smooth-signatures.html
-//
+//multi-path is from http://stackoverflow.com/questions/18316382/change-path-color-without-changing-previous-paths @leadrien
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +13,7 @@ import android.view.*;
 public class SignatureView extends View {
 	private static final float STROKE_WIDTH = 5f;
 	private static final boolean DEBUG = true;
+	private DatabaseHandler db;
 	  /** Need to track this so the dirty region can accommodate the stroke. **/
 	  private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
 
@@ -47,6 +48,10 @@ public class SignatureView extends View {
 	  private void init_strokes(){
 		  _allStrokes = new ArrayList<Stroke>();
           _activeStrokes = new SparseArray<Stroke>();
+	  }
+	  
+	  public void init_db(DatabaseHandler db){
+		  this.db = db;
 	  }
 	  
 	  /**
@@ -86,8 +91,25 @@ public class SignatureView extends View {
 	   * Creates the dots on the last stroke
 	   */
 	  public void make_dots() {
-	    //System.out.println(path.);
-		  
+		  if (_allStrokes.size() > 0) {
+		    //System.out.println(path.);
+			Stroke stroke = _allStrokes.get(_allStrokes.size() - 1);
+			Path path = stroke.getPath();
+			PathMeasure pm = new PathMeasure(path, false);
+			
+		    //coordinates will be here
+		    float aCoordinates[] = {0f, 0f};
+	
+		    //get point from the middle
+		    pm.getPosTan(pm.getLength() * 0.5f, aCoordinates, null);
+		    System.out.println();
+		    List<FloatPoint> fps = stroke.getFloatPoints();
+		    int group_id = stroke.getId();
+		    db.addPath(fps, group_id);
+		    List<FloatPoint> nfp = db.getPath(stroke.getId());
+		    Stroke new_stroke = new Stroke(nfp,stroke.getId()); 
+		    _allStrokes.add(new_stroke);
+		  }
 	  }
 
 	  
@@ -109,16 +131,19 @@ public class SignatureView extends View {
 		  }
 		  else {
 			  canvas.drawPath(path, paint);
+			  //canvas.draw
 		  }
 	  }
 
 	  @Override
 	  public boolean onTouchEvent(MotionEvent event) {
+		//in the future, consider making the touch to a circle or something OR double-click draw would be a circle
+		//take the dirtyRect implementation from the previous version and use it to smooth the lines -- Later
 	    float eventX = event.getX();
 	    float eventY = event.getY();
 	    //int x = (int)eventX;
 	    //int y = (int)eventY;
-	    int id = event.getPointerId(0);
+	    int id = event.getPointerId(0) + 1;
 	    //if (DEBUG) System.out.println("Registered: " + event.toString());
 	    switch (event.getAction()) {
 	      case MotionEvent.ACTION_DOWN:
@@ -185,7 +210,11 @@ public class SignatureView extends View {
 	    
 	    lastTouchX = eventX;
 	    lastTouchY = eventY;
-
+	    if (MotionEvent.ACTION_UP == event.getAction()){
+	    	Stroke stroke_up = _activeStrokes.get(id);
+	    	System.out.println("id is " + id);
+	    	stroke_up.save(db);
+	    }
 	    return true;
 	  }
 

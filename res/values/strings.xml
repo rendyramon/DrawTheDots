@@ -3,7 +3,7 @@
 
     <string name="app_name">DrawTheDots</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="clear">Clear</string>
+    <string name="clear">Undo</string>
     <string name="screen_text"></string>
     <string name="next">Next</string>
     <string name="clear_all">Clear All</string>
