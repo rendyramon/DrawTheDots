@@ -94,7 +94,7 @@ public class FullscreenActivity extends Activity {
 	
 	public void nextStep(View view){
 		//R.id.signatureView1
-		
-		//sig_view.make_dots();
+		//sig_view.make_test();
+		sig_view.make_dots();
 	}
 }

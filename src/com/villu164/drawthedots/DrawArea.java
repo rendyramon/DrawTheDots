@@ -93,6 +93,7 @@ public class DrawArea extends View {
         if (stroke != null) {
             Point pt = new Point(x, y);
             stroke.addPoint(pt);
+            System.out.println(stroke);
         }
     }
 }

@@ -20,7 +20,9 @@ public class Stroke {
     public Stroke(List<FloatPoint> path_points, int group_id){
     	_paint = new Paint();
     	_paint.setColor(Color.BLACK);
-    	_paint.setStrokeWidth(5f);
+    	_paint.setStyle(Paint.Style.STROKE);
+     	_paint.setStrokeWidth(5f);
+     	
     	Stroke _temp_stroke = new Stroke(_paint, group_id);
     	if (path_points != null) {
             for (FloatPoint fp: path_points) {
@@ -29,6 +31,26 @@ public class Stroke {
                 }
             }
         }
+    	_path = _temp_stroke.getPath();
+    	_temp_stroke = null;
+    	_id = group_id;
+    }
+    
+    public Stroke(DatabaseHandler db, int group_id){
+    	List<FloatPoint> nfp = db.getPath(group_id);
+    	Stroke _temp_stroke = new Stroke(_paint, group_id);
+    	if (nfp != null) {
+            for (FloatPoint fp: nfp) {
+                if (fp != null) {
+                	_temp_stroke.addPoint(fp);
+                }
+            }
+        }
+    	_paint = new Paint();
+    	_paint.setColor(db.getPathColor(group_id));
+    	_paint.setStyle(Paint.Style.STROKE);
+     	_paint.setStrokeWidth(5f);
+    	
     	_path = _temp_stroke.getPath();
     	_temp_stroke = null;
     	_id = group_id;
@@ -90,7 +112,7 @@ public class Stroke {
     public void save(DatabaseHandler db){
     	//sql update
     	if (!saved) {
-    		_id = db.getNextGroupId();
+    		_id = db.getNextGroupId(_paint);
     		db.addPath(_raw_path, _id);
     		saved = true;
     	}

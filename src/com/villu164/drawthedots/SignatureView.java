@@ -72,6 +72,7 @@ public class SignatureView extends View {
 	  public void clear(boolean clear_all) {
 	    path.reset();
 	    if (clear_all) {
+	    	db.deleteAllPaths();
 	    	init_strokes();
 	    }
 	    else {
@@ -91,25 +92,13 @@ public class SignatureView extends View {
 	   * Creates the dots on the last stroke
 	   */
 	  public void make_dots() {
-		  if (_allStrokes.size() > 0) {
-		    //System.out.println(path.);
-			Stroke stroke = _allStrokes.get(_allStrokes.size() - 1);
-			Path path = stroke.getPath();
-			PathMeasure pm = new PathMeasure(path, false);
-			
-		    //coordinates will be here
-		    float aCoordinates[] = {0f, 0f};
-	
-		    //get point from the middle
-		    pm.getPosTan(pm.getLength() * 0.5f, aCoordinates, null);
-		    System.out.println();
-		    List<FloatPoint> fps = stroke.getFloatPoints();
-		    int group_id = stroke.getId();
-		    db.addPath(fps, group_id);
-		    List<FloatPoint> nfp = db.getPath(stroke.getId());
-		    Stroke new_stroke = new Stroke(nfp,stroke.getId()); 
-		    _allStrokes.add(new_stroke);
-		  }
+		  db.getGroupIds();
+		  for (int gpid: db.getGroupIds()) {
+			List<FloatPoint> nfp = db.getPath(gpid);
+			Stroke new_stroke = new Stroke(db,gpid); 
+			_allStrokes.add(new_stroke);
+			invalidate();
+          }
 	  }
 
 	  
@@ -135,6 +124,26 @@ public class SignatureView extends View {
 		  }
 	  }
 
+	  public void make_test(){
+		  List<FloatPoint> floatPointList = new ArrayList<FloatPoint>();
+		  Paint paint_rnd = new Paint();
+	        paint_rnd.setStyle(Paint.Style.STROKE);
+	        paint_rnd.setStrokeWidth(STROKE_WIDTH);
+	        paint_rnd.setColor(_rdmColor.nextInt());
+
+		  int myid = _allStrokes.size() + 10;
+		  //Stroke new_stroke = new Stroke(floatPointList,myid);
+		  Stroke new_stroke = new Stroke(paint_rnd, myid);
+		  new_stroke.addPoint((float)94.0 + myid,(float)227.0);
+		  new_stroke.addPoint((float)196.0 + myid,(float)329.0);
+		  new_stroke.addPoint((float)300.0 + myid,(float)436.0);
+		  _activeStrokes.put(myid, new_stroke);
+		  _allStrokes.add(new_stroke);
+		  invalidate();
+		  
+		  
+	  }
+	  
 	  @Override
 	  public boolean onTouchEvent(MotionEvent event) {
 		//in the future, consider making the touch to a circle or something OR double-click draw would be a circle
@@ -143,7 +152,8 @@ public class SignatureView extends View {
 	    float eventY = event.getY();
 	    //int x = (int)eventX;
 	    //int y = (int)eventY;
-	    int id = event.getPointerId(0) + 1;
+	    int id = event.getPointerId(0);
+	    //int id = _activeStrokes.size() + 1;
 	    //if (DEBUG) System.out.println("Registered: " + event.toString());
 	    switch (event.getAction()) {
 	      case MotionEvent.ACTION_DOWN:
