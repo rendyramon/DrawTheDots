@@ -18,7 +18,7 @@ public class SignatureView extends View {
 	private FullscreenActivity fsa;
 	/** Need to track this so the dirty region can accommodate the stroke. **/
 	private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
-
+	private int _selection_index = 0;
 	private Paint paint = new Paint();
 	private Path path = new Path();
 	//private View contentView;
@@ -72,6 +72,7 @@ public class SignatureView extends View {
 		int id = stroke.getId();
 		if (id > -1) _activeStrokes.delete(id);
 		// Repaints the entire view.
+		_has_selection = false;
 		invalidate();
 	}
 
@@ -90,6 +91,7 @@ public class SignatureView extends View {
 		}
 
 		// Repaints the entire view.
+		_has_selection = false;
 		invalidate();
 	}
 
@@ -141,14 +143,16 @@ public class SignatureView extends View {
 			float cy = (float)200.3;
 			Paint new_paint = _selectedStroke.getPaint();
 			//selected_paint.setColor(new_paint.getColor());
-			selected_paint.setColor(Color.RED);
+			selected_paint.setColor(Color.BLUE);
+			selected_paint.setStyle(Paint.Style.STROKE);
 			selected_paint.setStrokeWidth(new_paint.getStrokeWidth());
+			canvas.drawPath(_selectedStroke.getPath(), selected_paint);
 			selected_paint.setStyle(Paint.Style.FILL);
+			selected_paint.setColor(Color.RED);
 			List<FloatPoint> points = _selectedStroke.getSelectedPoints();
 			for (FloatPoint fp: points) {
 				canvas.drawCircle(fp.x, fp.y, 3, selected_paint);
 			}
-			if (points.size() == 0) message("No points yet");
 			//canvas.drawCircle(cx, cy, 30, new_paint);
 		}
 	}
@@ -186,6 +190,7 @@ public class SignatureView extends View {
 				stroke.addPoint(eventX, eventY);
 				_activeStrokes.put(id, stroke);
 				_allStrokes.add(stroke);
+				reset();
 				// There is no end point yet, so don't waste cycles invalidating.
 				return true;
 
@@ -289,9 +294,28 @@ public class SignatureView extends View {
 		fsa.message(message, length);
 	}
 
-	public void select() {
+	public void select(){
+		reset();
+		select(0);
+	}
+
+	public void move(int move_by){
+		if (_allStrokes.size() == 0) {
+			_selection_index = 0;
+			return;
+		}
+		_selection_index = (_selection_index + _allStrokes.size() + move_by) % _allStrokes.size();	
+
+	}
+	public void reset(){
+		_selection_index = _allStrokes.size() - 1;
+	}
+
+	public void select(int move_by) {
 		// TODO Auto-generated method stub
-		if (_has_selection) {
+		if (!_has_selection && move_by != 0) reset();
+		
+		if (_has_selection && move_by == 0) {
 			_has_selection = false;
 			_selectedStroke = null;
 			message("DeSelected!");
@@ -299,11 +323,12 @@ public class SignatureView extends View {
 		else {
 			Stroke stroke = new Stroke(paint,0);
 			if (_allStrokes.size() > 0) {
-				stroke = _allStrokes.get(_allStrokes.size() - 1);
+				move(move_by);
+				stroke = _allStrokes.get(_selection_index);
 				int id = stroke.getId();
 				_selectedStroke = stroke;
 				_has_selection = true;
-				message("Selected! id=" + id,true);
+				message("Selected! id=" + _selection_index + "/" + _allStrokes.size(),true);
 			}
 			else {
 				message("Draw something first!");

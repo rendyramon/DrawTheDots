@@ -105,9 +105,16 @@ public class FullscreenActivity extends Activity {
 	}
 	
 	public void selectLast(View view){
-		//R.id.signatureView1
-		
-		sig_view.select();
+		sig_view.reset();
+		sig_view.select(0);
+	}
+	
+	public void selectNext(View view){
+		sig_view.select(1);
+	}
+
+	public void selectPrevious(View view){
+		sig_view.select(-1);
 	}
 	
 	public void nextStep(View view){
