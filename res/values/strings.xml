@@ -7,5 +7,6 @@
     <string name="screen_text"></string>
     <string name="next">Next</string>
     <string name="clear_all">Clear All</string>
+    <string name="crash_toast_text">Oops, something went wrong!</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.villu164.drawthedots;
 
+
 import com.villu164.drawthedots.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -60,7 +61,6 @@ public class FullscreenActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		setContentView(R.layout.activity_fullscreen);
 
 		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.felt2);
