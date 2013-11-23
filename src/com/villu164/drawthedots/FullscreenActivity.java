@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import android.graphics.Bitmap;
@@ -75,8 +76,19 @@ public class FullscreenActivity extends Activity {
 		// while interacting with the UI.
 		db = new DatabaseHandler(this);
 		sig_view.init_db(db);
+		sig_view.init_parent(this);
 		//db.onUpgrade(db.getWritableDatabase(), 0, 1);
 		System.out.println(db.getPathsCount());
+	}
+	
+	public void message(String message){
+		message(message,false);
+	}
+	
+	public void message(String message, boolean long_message){
+		int message_length = Toast.LENGTH_SHORT;
+		if (long_message) message_length = Toast.LENGTH_LONG;
+		Toast.makeText(getApplicationContext(), message,message_length).show();
 	}
 
 	
@@ -90,6 +102,12 @@ public class FullscreenActivity extends Activity {
 		//R.id.signatureView1
 		
 		sig_view.clear();
+	}
+	
+	public void selectLast(View view){
+		//R.id.signatureView1
+		
+		sig_view.select();
 	}
 	
 	public void nextStep(View view){

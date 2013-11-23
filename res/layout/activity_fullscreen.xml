@@ -72,6 +72,15 @@
             android:layout_gravity="bottom"
             android:onClick="nextStep"
             android:text="@string/next" />
+        
+        <Button
+            android:id="@+id/select"
+            style="?buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:onClick="selectLast"
+            android:text="@string/select" />
             
         </LinearLayout>
 
