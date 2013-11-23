@@ -124,32 +124,13 @@ public class SignatureView extends View {
 		  }
 	  }
 
-	  public void make_test(){
-		  List<FloatPoint> floatPointList = new ArrayList<FloatPoint>();
-		  Paint paint_rnd = new Paint();
-	        paint_rnd.setStyle(Paint.Style.STROKE);
-	        paint_rnd.setStrokeWidth(STROKE_WIDTH);
-	        paint_rnd.setColor(_rdmColor.nextInt());
 
-		  int myid = _allStrokes.size() + 10;
-		  //Stroke new_stroke = new Stroke(floatPointList,myid);
-		  Stroke new_stroke = new Stroke(paint_rnd, myid);
-		  new_stroke.addPoint((float)94.0 + myid,(float)227.0);
-		  new_stroke.addPoint((float)196.0 + myid,(float)329.0);
-		  new_stroke.addPoint((float)300.0 + myid,(float)436.0);
-		  _activeStrokes.put(myid, new_stroke);
-		  _allStrokes.add(new_stroke);
-		  invalidate();
-		  
-		  
-	  }
-	  
 	  @Override
 	  public boolean onTouchEvent(MotionEvent event) {
 		//in the future, consider making the touch to a circle or something OR double-click draw would be a circle
 		//take the dirtyRect implementation from the previous version and use it to smooth the lines -- Later
-	    float eventX = event.getX();
-	    float eventY = event.getY();
+	    float eventX = event.getX(0);
+	    float eventY = event.getY(0);
 	    //int x = (int)eventX;
 	    //int y = (int)eventY;
 	    int id = event.getPointerId(0);
@@ -220,7 +201,7 @@ public class SignatureView extends View {
 	    
 	    lastTouchX = eventX;
 	    lastTouchY = eventY;
-	    if (MotionEvent.ACTION_UP == event.getAction()){
+	    if (id == 0 && MotionEvent.ACTION_UP == event.getAction()){
 	    	Stroke stroke_up = _activeStrokes.get(id);
 	    	System.out.println("id is " + id);
 	    	stroke_up.save(db);
