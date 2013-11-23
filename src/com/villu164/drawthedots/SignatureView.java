@@ -29,6 +29,8 @@ public class SignatureView extends View {
 	private boolean _has_selection = false;
 	private Random _rdmColor = new Random();
 
+	private Paint selected_paint = new Paint();
+
 	/**
 	 * Optimizes painting by invalidating the smallest possible area.
 	 */
@@ -114,9 +116,17 @@ public class SignatureView extends View {
 				for (Stroke stroke: _allStrokes) {
 					if (stroke != null) {
 						Path path = stroke.getPath();
+						int id = stroke.getId();
 						Paint painter = stroke.getPaint();
 						if ((path != null) && (painter != null)) {
 							canvas.drawPath(path, painter);
+							selected_paint.setStyle(Paint.Style.FILL);
+							selected_paint.setColor(Color.BLACK);
+							selected_paint.setStrokeWidth(stroke.getPaint().getStrokeWidth());
+							List<FloatPoint> points = stroke.getFloatPoints();
+							for (FloatPoint fp: points) {
+								canvas.drawCircle(fp.x, fp.y, 3, selected_paint);
+							}
 						}
 					}
 				}
@@ -125,6 +135,21 @@ public class SignatureView extends View {
 		else {
 			canvas.drawPath(path, paint);
 			//canvas.draw
+		}
+		if (_has_selection) {
+			float cx = (float)200.4;
+			float cy = (float)200.3;
+			Paint new_paint = _selectedStroke.getPaint();
+			//selected_paint.setColor(new_paint.getColor());
+			selected_paint.setColor(Color.RED);
+			selected_paint.setStrokeWidth(new_paint.getStrokeWidth());
+			selected_paint.setStyle(Paint.Style.FILL);
+			List<FloatPoint> points = _selectedStroke.getSelectedPoints();
+			for (FloatPoint fp: points) {
+				canvas.drawCircle(fp.x, fp.y, 3, selected_paint);
+			}
+			if (points.size() == 0) message("No points yet");
+			//canvas.drawCircle(cx, cy, 30, new_paint);
 		}
 	}
 
@@ -217,7 +242,10 @@ public class SignatureView extends View {
 		else{
 			switch(action){
 			case MotionEvent.ACTION_DOWN:
-				message("Cannot draw, selection is active!");
+				//message("Cannot draw, selection is active!");
+				//_selectedStroke.getSelectedPoints().add(new FloatPoint(eventX,eventY));
+				_selectedStroke.addToPath(new FloatPoint(eventX,eventY));
+				invalidate();
 				break;
 			}
 		}

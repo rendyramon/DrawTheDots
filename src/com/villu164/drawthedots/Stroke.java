@@ -16,6 +16,7 @@ public class Stroke {
     private boolean saved = false;
     private String save_name = null;
     private List<FloatPoint> _raw_path; //all elements that You need
+    private List<FloatPoint> _selection_points = new ArrayList<FloatPoint>();; //all elements that You need
 
     public Stroke(List<FloatPoint> path_points, int group_id){
     	_paint = new Paint();
@@ -124,6 +125,31 @@ public class Stroke {
     	return _raw_path;
     }
     
+    public List<FloatPoint> getSelectedPoints(){
+    	return _selection_points;
+    }
+    
+    public void addToPath(FloatPoint fp){
+    	float min = 0;
+    	FloatPoint min_fp = null;
+    	boolean first = true;
+    	for (FloatPoint line_fp: _raw_path) {
+    		float compare = fp.distance(line_fp);
+            if (first){
+            	first = false;
+            	min = compare;
+            	min_fp = line_fp;
+            }
+            else {
+            	if (compare < min) {
+            		min = compare;
+            		min_fp = line_fp;
+            	}
+            }
+        }
+    	_selection_points.add(min_fp);
+    }
+    
     public String toString(){
     	String out = "";
     	if (_raw_path != null) {
@@ -135,4 +161,5 @@ public class Stroke {
         }
     	return out;
     }
+    
 }
