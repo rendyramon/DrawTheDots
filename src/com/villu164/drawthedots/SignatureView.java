@@ -32,6 +32,9 @@ public class SignatureView extends View {
 	private Paint selected_paint = new Paint();
 	private Paint selected_point_paint = new Paint();
 	private Paint deselected_point_paint = new Paint();
+	private Paint white_fill = new Paint();
+	private Paint black_fill = new Paint();
+	private Paint black_text = new Paint();
 
 	/**
 	 * Optimizes painting by invalidating the smallest possible area.
@@ -65,6 +68,17 @@ public class SignatureView extends View {
 		deselected_point_paint.setStyle(Paint.Style.FILL);
 		deselected_point_paint.setColor(Color.BLACK);
 		deselected_point_paint.setStrokeWidth(STROKE_WIDTH);
+		black_fill.setStyle(Paint.Style.FILL);
+		black_fill.setColor(Color.BLACK);
+		black_fill.setStrokeWidth(STROKE_WIDTH);
+		white_fill.setStyle(Paint.Style.FILL);
+		white_fill.setColor(Color.WHITE);
+		white_fill.setStrokeWidth(STROKE_WIDTH);
+		black_text.setStyle(Paint.Style.FILL);
+		black_text.setColor(Color.BLACK);
+		black_text.setStrokeWidth(STROKE_WIDTH);
+		black_text.setTextAlign(Paint.Align.CENTER);
+		black_text.setTextSize(10);
 	}
 
 	public void init_db(DatabaseHandler db){
@@ -137,8 +151,19 @@ public class SignatureView extends View {
 							
 							List<FloatPoint> points = stroke.getFloatPoints();
 							for (FloatPoint fp: points) {
-								if (fp.selected) canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
-								else canvas.drawCircle(fp.x, fp.y, 3, deselected_point_paint);
+								if (!fp.selected) canvas.drawCircle(fp.x, fp.y, 3, deselected_point_paint);
+							}
+							int count_index = 1;
+							for (FloatPoint fp: points) {
+								if (fp.selected) {
+									canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
+									if(_has_selection && _selectedStroke == stroke) {
+										canvas.drawCircle(fp.x, fp.y, 10, black_fill);
+										canvas.drawCircle(fp.x, fp.y, 8, white_fill);
+										canvas.drawText(count_index + "", fp.x, fp.y + black_text.getTextSize()/2, black_text);
+										count_index++;
+									}
+								}
 							}
 						}
 					}

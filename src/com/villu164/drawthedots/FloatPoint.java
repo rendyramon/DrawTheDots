@@ -21,6 +21,10 @@ public class FloatPoint {
 	public void deselect(){
 		selected = false;
 	}
+	
+	public void toggle_select(){
+		selected = !selected;
+	}
 
 	public void set_selected(int i){
 		if (i == 0) deselect();
