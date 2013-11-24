@@ -111,7 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (fp != null) {
                 	// Inserting Row
                 	ContentValues values = new ContentValues();
-                    values.put(KEY_SELECTED, fp.selected); // is path selected
+                    values.put(KEY_SELECTED, fp.selected_int()); // is path selected
                     values.put(KEY_GROUP_ID, group_id); // is path selected
                     values.put(KEY_X, fp.x); // is path selected
                     values.put(KEY_Y, fp.y); // is path selected
@@ -163,7 +163,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             	int groupy_id = cursor.getInt(4);
             	debug(groupy_id + "/" + id + ":" + xx + ";" + yy + "  " + selected);
             	FloatPoint fp = new FloatPoint(xx + 10,yy + 10);
-        		fp.selected = cursor.getInt(3);
+        		fp.set_selected(cursor.getInt(3));
                 
                 floatPointList.add(fp);
         	} while (cursor.moveToNext());

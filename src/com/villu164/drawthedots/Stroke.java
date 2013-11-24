@@ -147,6 +147,7 @@ public class Stroke {
             	}
             }
         }
+    	if (min_fp != null) min_fp.select();
     	_selection_points.add(min_fp);
     }
     

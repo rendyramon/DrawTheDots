@@ -30,6 +30,8 @@ public class SignatureView extends View {
 	private Random _rdmColor = new Random();
 
 	private Paint selected_paint = new Paint();
+	private Paint selected_point_paint = new Paint();
+	private Paint deselected_point_paint = new Paint();
 
 	/**
 	 * Optimizes painting by invalidating the smallest possible area.
@@ -54,6 +56,15 @@ public class SignatureView extends View {
 	private void init_strokes(){
 		_allStrokes = new ArrayList<Stroke>();
 		_activeStrokes = new SparseArray<Stroke>();
+		selected_paint.setStyle(Paint.Style.STROKE);
+		selected_paint.setColor(Color.BLUE);
+		selected_paint.setStrokeWidth(STROKE_WIDTH);
+		selected_point_paint.setStyle(Paint.Style.FILL);
+		selected_point_paint.setColor(Color.RED);
+		selected_point_paint.setStrokeWidth(STROKE_WIDTH);
+		deselected_point_paint.setStyle(Paint.Style.FILL);
+		deselected_point_paint.setColor(Color.BLACK);
+		deselected_point_paint.setStrokeWidth(STROKE_WIDTH);
 	}
 
 	public void init_db(DatabaseHandler db){
@@ -121,13 +132,13 @@ public class SignatureView extends View {
 						int id = stroke.getId();
 						Paint painter = stroke.getPaint();
 						if ((path != null) && (painter != null)) {
-							canvas.drawPath(path, painter);
-							selected_paint.setStyle(Paint.Style.FILL);
-							selected_paint.setColor(Color.BLACK);
-							selected_paint.setStrokeWidth(stroke.getPaint().getStrokeWidth());
+							if(_has_selection && _selectedStroke == stroke) canvas.drawPath(_selectedStroke.getPath(), selected_paint);
+							else canvas.drawPath(path, painter);
+							
 							List<FloatPoint> points = stroke.getFloatPoints();
 							for (FloatPoint fp: points) {
-								canvas.drawCircle(fp.x, fp.y, 3, selected_paint);
+								if (fp.selected) canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
+								else canvas.drawCircle(fp.x, fp.y, 3, deselected_point_paint);
 							}
 						}
 					}
@@ -138,20 +149,13 @@ public class SignatureView extends View {
 			canvas.drawPath(path, paint);
 			//canvas.draw
 		}
-		if (_has_selection) {
+		if (_has_selection && 1 > 2) {
 			float cx = (float)200.4;
 			float cy = (float)200.3;
-			Paint new_paint = _selectedStroke.getPaint();
-			//selected_paint.setColor(new_paint.getColor());
-			selected_paint.setColor(Color.BLUE);
-			selected_paint.setStyle(Paint.Style.STROKE);
-			selected_paint.setStrokeWidth(new_paint.getStrokeWidth());
 			canvas.drawPath(_selectedStroke.getPath(), selected_paint);
-			selected_paint.setStyle(Paint.Style.FILL);
-			selected_paint.setColor(Color.RED);
 			List<FloatPoint> points = _selectedStroke.getSelectedPoints();
 			for (FloatPoint fp: points) {
-				canvas.drawCircle(fp.x, fp.y, 3, selected_paint);
+				if (fp.selected) canvas.drawCircle(fp.x, fp.y, 5, selected_point_paint);
 			}
 			//canvas.drawCircle(cx, cy, 30, new_paint);
 		}
@@ -241,7 +245,7 @@ public class SignatureView extends View {
 			if (id == 0 && MotionEvent.ACTION_UP == event.getAction()){
 				Stroke stroke_up = _activeStrokes.get(id);
 				System.out.println("id is " + id);
-				stroke_up.save(db);
+				//stroke_up.save(db); //not saving to database, to make it faster
 			}
 		}
 		else{
@@ -318,7 +322,7 @@ public class SignatureView extends View {
 		if (_has_selection && move_by == 0) {
 			_has_selection = false;
 			_selectedStroke = null;
-			message("DeSelected!");
+			//message("DeSelected!");
 		}
 		else {
 			Stroke stroke = new Stroke(paint,0);
@@ -328,7 +332,7 @@ public class SignatureView extends View {
 				int id = stroke.getId();
 				_selectedStroke = stroke;
 				_has_selection = true;
-				message("Selected! id=" + _selection_index + "/" + _allStrokes.size(),true);
+				//message("Selected! id=" + _selection_index + "/" + _allStrokes.size(),true);
 			}
 			else {
 				message("Draw something first!");

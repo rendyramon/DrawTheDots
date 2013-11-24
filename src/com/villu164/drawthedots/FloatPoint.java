@@ -3,15 +3,37 @@ package com.villu164.drawthedots;
 public class FloatPoint {
 	public float x;
 	public float y;
-	public int selected = 0;
+	public boolean selected = false;
 	public FloatPoint(float x, float y){
 		this.x = x;
 		this.y = y;
 	}
-	public FloatPoint(float x, float y, int selected){
+	public FloatPoint(float x, float y, boolean selected){
 		this.x = x;
 		this.y = y;
 		this.selected = selected;
+	}
+	
+	public void select(){
+		selected = true;
+	}
+	
+	public void deselect(){
+		selected = false;
+	}
+
+	public void set_selected(int i){
+		if (i == 0) deselect();
+		else select();
+	}
+	
+	public void set_selected(boolean b){
+		selected = b;
+	}
+	
+	public int selected_int(){
+		if (selected) return 1;
+		return 0;
 	}
 	
 	public float distance(FloatPoint fp) {
