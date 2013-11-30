@@ -47,6 +47,17 @@ public class FloatPoint {
 		return dist;
 	}
 	
+	//allowing biggest delta difference between points to make the algo faster
+	//returning -1 if out of range
+	public float distance(FloatPoint fp, float delta) {
+		float dx = (float)(fp.x - x);
+		if (Math.abs(dx) > delta) return -1;
+		float dy = (float)(fp.y - y);
+		if (Math.abs(dy) > delta) return -1;
+		float dist = (float)Math.sqrt(dx*dx + dy*dy);
+		return dist;
+	}
+	
 	public String toString(){
 		return selected + "["+x + "," + y + "]";
 	}

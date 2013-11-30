@@ -125,18 +125,17 @@ public class Stroke {
     	return _raw_path;
     }
     
-    public List<FloatPoint> getSelectedPoints(){
-    	return _selection_points;
+    public void addToPath(FloatPoint fp){
+    	FloatPoint min_fp = nearestPoint(fp,20);
+    	if (min_fp != null) min_fp.toggle_select();
     }
     
-    public void addToPath(FloatPoint fp){
+    public FloatPoint nearestPoint(FloatPoint fp){
     	float min = 0;
     	FloatPoint min_fp = null;
-    	boolean first = true;
     	for (FloatPoint line_fp: _raw_path) {
     		float compare = fp.distance(line_fp);
-            if (first){
-            	first = false;
+            if (min_fp == null){
             	min = compare;
             	min_fp = line_fp;
             }
@@ -147,8 +146,40 @@ public class Stroke {
             	}
             }
         }
-    	if (min_fp != null) min_fp.toggle_select();
-    	_selection_points.add(min_fp);
+    	return min_fp;
+    }
+    
+    public FloatPoint nearestPoint(FloatPoint fp, float delta){
+    	float min = 0;
+    	float min_selected = 0;
+    	FloatPoint min_fp = null;
+    	FloatPoint min_selected_fp = null;
+    	for (FloatPoint line_fp: _raw_path) {
+    		float compare = fp.distance(line_fp, delta);
+    		if (compare < 0) continue;
+            if (min_fp == null){
+            	min = compare;
+            	min_fp = line_fp;
+            }
+            if (line_fp.selected && min_selected_fp == null){
+            	min_selected = compare;
+            	min_selected_fp = line_fp;
+            }
+            if (line_fp.selected){
+                if (compare < min_selected) {
+                	min_selected = compare;
+                	min_selected_fp = line_fp;
+            	}
+            }
+            else{
+                if (compare < min) {
+            		min = compare;
+            		min_fp = line_fp;
+            	}
+            }
+        }
+    	if (min_selected_fp != null) return min_selected_fp;
+    	return min_fp;
     }
     
     public String toString(){

@@ -174,16 +174,7 @@ public class SignatureView extends View {
 			canvas.drawPath(path, paint);
 			//canvas.draw
 		}
-		if (_has_selection && 1 > 2) {
-			float cx = (float)200.4;
-			float cy = (float)200.3;
-			canvas.drawPath(_selectedStroke.getPath(), selected_paint);
-			List<FloatPoint> points = _selectedStroke.getSelectedPoints();
-			for (FloatPoint fp: points) {
-				if (fp.selected) canvas.drawCircle(fp.x, fp.y, 5, selected_point_paint);
-			}
-			//canvas.drawCircle(cx, cy, 30, new_paint);
-		}
+		
 	}
 
 
