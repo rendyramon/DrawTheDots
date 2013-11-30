@@ -16,7 +16,6 @@ public class Stroke {
     private boolean saved = false;
     private String save_name = null;
     private List<FloatPoint> _raw_path; //all elements that You need
-    private List<FloatPoint> _selection_points = new ArrayList<FloatPoint>();; //all elements that You need
 
     public Stroke(List<FloatPoint> path_points, int group_id){
     	_paint = new Paint();

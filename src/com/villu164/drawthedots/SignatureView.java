@@ -18,6 +18,7 @@ public class SignatureView extends View {
 	private FullscreenActivity fsa;
 	/** Need to track this so the dirty region can accommodate the stroke. **/
 	private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
+	private static final float FINGER_WIDTH = (float)10;
 	private int _selection_index = 0;
 	private Paint paint = new Paint();
 	private Path path = new Path();
@@ -269,7 +270,44 @@ public class SignatureView extends View {
 			case MotionEvent.ACTION_DOWN:
 				//message("Cannot draw, selection is active!");
 				//_selectedStroke.getSelectedPoints().add(new FloatPoint(eventX,eventY));
-				_selectedStroke.addToPath(new FloatPoint(eventX,eventY));
+				FloatPoint touch_down_fp = new FloatPoint(eventX,eventY);
+				FloatPoint nearest = _selectedStroke.nearestPoint(touch_down_fp,FINGER_WIDTH);
+				if (nearest != null) nearest.toggle_select();
+				else {
+					
+//					List<FloatPoint> _selection_points = new ArrayList<FloatPoint>();; //all elements that You need
+					if (_allStrokes != null) {
+						FloatPoint min_selected_fp = null;
+						Stroke closest_stroke = null;
+						float min_selected = 0;
+						for (Stroke stroke: _allStrokes) {
+							if (stroke != null) {
+								nearest = stroke.nearestPoint(touch_down_fp, FINGER_WIDTH);
+								if (nearest != null){
+									if (min_selected_fp == null){
+										min_selected_fp = nearest;
+										closest_stroke = stroke;
+									}
+									float compare = min_selected_fp.distance(nearest, FINGER_WIDTH);
+									if (compare > 0 && compare < min_selected){
+										min_selected_fp = nearest;
+										closest_stroke = stroke;
+										min_selected = compare;
+									}
+								}
+							}
+						}
+						if (min_selected_fp != null){
+							min_selected_fp.toggle_select();
+							_selectedStroke = closest_stroke;
+						}
+					}
+					//if (nearest == null) _has_selection = false;
+					
+					
+					
+					
+				}
 				invalidate();
 				break;
 			}
