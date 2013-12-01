@@ -18,7 +18,7 @@ public class SignatureView extends View {
 	private FullscreenActivity fsa;
 	/** Need to track this so the dirty region can accommodate the stroke. **/
 	private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
-	private static final float FINGER_WIDTH = (float)10;
+	private static final float FINGER_WIDTH = (float)20;
 	private int _selection_index = 0;
 	private Paint paint = new Paint();
 	private Path path = new Path();
@@ -126,7 +126,10 @@ public class SignatureView extends View {
 	 * Creates the dots on the last stroke
 	 */
 	public void make_dots() {
-		db.getGroupIds();
+		for(Stroke stroke: _allStrokes){
+			stroke.save(db);
+		}
+		init_strokes();
 		for (int gpid: db.getGroupIds()) {
 			List<FloatPoint> nfp = db.getPath(gpid);
 			Stroke new_stroke = new Stroke(db,gpid); 
@@ -151,12 +154,14 @@ public class SignatureView extends View {
 							else canvas.drawPath(path, painter);
 							
 							List<FloatPoint> points = stroke.getFloatPoints();
+							if (points == null) continue;
 							for (FloatPoint fp: points) {
-								if (!fp.selected) canvas.drawCircle(fp.x, fp.y, 3, deselected_point_paint);
+								if (!fp.get_selected()) canvas.drawCircle(fp.x, fp.y, 3, deselected_point_paint);
 							}
 							int count_index = 1;
 							for (FloatPoint fp: points) {
-								if (fp.selected) {
+								if (fp.get_selected()) {
+									debug(fp.toString());
 									canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
 									if(_has_selection && _selectedStroke == stroke) {
 										canvas.drawCircle(fp.x, fp.y, 10, black_fill);
@@ -208,7 +213,7 @@ public class SignatureView extends View {
 				//create the Stroke
 				//Point pt = new Point(x,y);
 				Stroke stroke = new Stroke(paint_rnd, id);
-				stroke.addPoint(eventX, eventY);
+				stroke.addPoint(eventX, eventY, false);
 				_activeStrokes.put(id, stroke);
 				_allStrokes.add(stroke);
 				reset();
@@ -233,7 +238,7 @@ public class SignatureView extends View {
 					path.lineTo(historicalX, historicalY);
 					if (stroke_move != null) {
 						//Point pt_move = new Point(historical_x, historical_y);
-						stroke_move.addPoint(historicalX, historicalY);
+						stroke_move.addPoint(historicalX, historicalY, false);
 					}
 				}
 
@@ -241,7 +246,7 @@ public class SignatureView extends View {
 				path.lineTo(eventX, eventY);
 				if (stroke_move != null) {
 					//Point pt_move = new Point(x, y);
-					stroke_move.addPoint(eventX, eventY);
+					stroke_move.addPoint(eventX, eventY, false);
 				}
 				break;
 
@@ -270,7 +275,7 @@ public class SignatureView extends View {
 			case MotionEvent.ACTION_DOWN:
 				//message("Cannot draw, selection is active!");
 				//_selectedStroke.getSelectedPoints().add(new FloatPoint(eventX,eventY));
-				FloatPoint touch_down_fp = new FloatPoint(eventX,eventY);
+				FloatPoint touch_down_fp = new FloatPoint(eventX,eventY,false);
 				FloatPoint nearest = _selectedStroke.nearestPoint(touch_down_fp,FINGER_WIDTH);
 				if (nearest != null) nearest.toggle_select();
 				else {
@@ -345,6 +350,10 @@ public class SignatureView extends View {
 		dirtyRect.bottom = Math.max(lastTouchY, eventY);
 	}
 
+	public void debug(String message){
+		System.out.println(message);
+	}
+	
 	public void message(String message){
 		message(message, false);
 	}

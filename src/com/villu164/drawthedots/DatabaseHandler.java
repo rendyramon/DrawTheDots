@@ -32,7 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_PATHS = "paths";
     private static final String TABLE_PATH_COLLECTIONS = "path_collections";
     
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
  
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
@@ -111,7 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (fp != null) {
                 	// Inserting Row
                 	ContentValues values = new ContentValues();
-                    values.put(KEY_SELECTED, fp.selected_int()); // is path selected
+                    values.put(KEY_SELECTED, fp.get_selected_int()); // is path selected
                     values.put(KEY_GROUP_ID, group_id); // is path selected
                     values.put(KEY_X, fp.x); // is path selected
                     values.put(KEY_Y, fp.y); // is path selected
@@ -162,9 +162,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             	float yy = cursor.getFloat(3);
             	int groupy_id = cursor.getInt(4);
             	debug(groupy_id + "/" + id + ":" + xx + ";" + yy + "  " + selected);
-            	FloatPoint fp = new FloatPoint(xx + 10,yy + 10);
-        		fp.set_selected(cursor.getInt(3));
+            	FloatPoint fp = new FloatPoint(xx,yy,selected);
                 
+        	
                 floatPointList.add(fp);
         	} while (cursor.moveToNext());
         }

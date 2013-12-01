@@ -52,6 +52,8 @@ public class Stroke {
      	_paint.setStrokeWidth(5f);
     	
     	_path = _temp_stroke.getPath();
+    	_raw_path = _temp_stroke.getFloatPoints();
+    	saved = true;
     	_temp_stroke = null;
     	_id = group_id;
     }
@@ -87,18 +89,18 @@ public class Stroke {
         }
     }
     
-    public void addPoint(float x, float y) {
+    public void addPoint(float x, float y, boolean selected) {
         if (_path == null) {
             _path = new Path();
             _path.moveTo(x, y);
         } else {
             _path.lineTo(x, y);
         }
-        _raw_path.add(new FloatPoint(x,y));
+        _raw_path.add(new FloatPoint(x,y,selected));
     }
     
     public void addPoint(FloatPoint fp) {
-        addPoint(fp.x,fp.y);
+        addPoint(fp.x,fp.y,fp.get_selected());
     }
     
     public void saveAs(String save_id){
@@ -160,11 +162,11 @@ public class Stroke {
             	min = compare;
             	min_fp = line_fp;
             }
-            if (line_fp.selected && min_selected_fp == null){
+            if (line_fp.get_selected() && min_selected_fp == null){
             	min_selected = compare;
             	min_selected_fp = line_fp;
             }
-            if (line_fp.selected){
+            if (line_fp.get_selected()){
                 if (compare < min_selected) {
                 	min_selected = compare;
                 	min_selected_fp = line_fp;

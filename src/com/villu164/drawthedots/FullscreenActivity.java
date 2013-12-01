@@ -118,6 +118,6 @@ public class FullscreenActivity extends Activity {
 	}
 	
 	public void nextStep(View view){
-		//sig_view.make_dots(); //cannot use at the moment, because
+		sig_view.make_dots(); //cannot use at the moment, because
 	}
 }

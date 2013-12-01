@@ -3,41 +3,45 @@ package com.villu164.drawthedots;
 public class FloatPoint {
 	public float x;
 	public float y;
-	public boolean selected = false;
-	public FloatPoint(float x, float y){
-		this.x = x;
-		this.y = y;
-	}
+	private boolean selected = false;
 	public FloatPoint(float x, float y, boolean selected){
 		this.x = x;
 		this.y = y;
-		this.selected = selected;
+		if (selected) select();
 	}
+	
+	public FloatPoint(float x, float y, float selected){
+		this.x = x;
+		this.y = y;
+		if (selected > 0) {
+			select();
+			System.out.println("Setting: " + this.toString() + " to true");
+		}
+	}
+	
 	
 	public void select(){
 		selected = true;
 	}
 	
-	public void deselect(){
-		selected = false;
-	}
-	
+
 	public void toggle_select(){
 		selected = !selected;
 	}
 
-	public void set_selected(int i){
-		if (i == 0) deselect();
-		else select();
+	public boolean get_selected(){
+		if (selected) {
+			System.out.println("TRUETRUETRUE: " + this.toString());
+			return true;
+		}
+		return false;
 	}
-	
-	public void set_selected(boolean b){
-		selected = b;
-	}
-	
-	public int selected_int(){
-		if (selected) return 1;
-		return 0;
+	public float get_selected_int(){
+		if (selected) {
+			System.out.println("TRUETRUETRUE: " + this.toString());
+			return (float)1.0;
+		}
+		return (float)0;
 	}
 	
 	public float distance(FloatPoint fp) {

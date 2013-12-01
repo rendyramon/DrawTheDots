@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:onClick="nextStep"
-            android:visibility="gone"
+            android:visibility="visible"
             android:text="@string/next" />
         
         <Button
