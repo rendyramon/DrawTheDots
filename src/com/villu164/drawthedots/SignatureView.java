@@ -36,6 +36,10 @@ public class SignatureView extends View {
 	private Paint white_fill = new Paint();
 	private Paint black_fill = new Paint();
 	private Paint black_text = new Paint();
+	private boolean done = true;
+	private FloatPoint last_point = null;
+	private FloatPoint moving_point = null;
+	
 
 	/**
 	 * Optimizes painting by invalidating the smallest possible area.
@@ -162,6 +166,10 @@ public class SignatureView extends View {
 							for (FloatPoint fp: points) {
 								if (fp.get_selected()) {
 									debug(fp.toString());
+									if (moving_point != null){
+										float dist = moving_point.distance(fp, FINGER_WIDTH);
+										if (dist > 0) moving_point = fp;
+									}
 									canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
 									if(_has_selection && _selectedStroke == stroke) {
 										canvas.drawCircle(fp.x, fp.y, 10, black_fill);
@@ -180,6 +188,7 @@ public class SignatureView extends View {
 			canvas.drawPath(path, paint);
 			//canvas.draw
 		}
+		if (last_point != null && moving_point != null) canvas.drawLine(last_point.x, last_point.y, moving_point.x, moving_point.y, deselected_point_paint);
 		
 	}
 
@@ -204,6 +213,11 @@ public class SignatureView extends View {
 				lastTouchX = eventX;
 				lastTouchY = eventY;
 
+				if (done) {
+					//last_point = new FloatPoint(eventX,eventY,false);
+					return true;
+				}
+				
 				//create a paint with random color
 				Paint paint_rnd = new Paint();
 				paint_rnd.setStyle(Paint.Style.STROKE);
@@ -221,7 +235,16 @@ public class SignatureView extends View {
 				return true;
 
 			case MotionEvent.ACTION_MOVE:
+				if (done) {
+					moving_point = new FloatPoint(eventX,eventY,false);
+					invalidate();
+					return true;
+				}
 			case MotionEvent.ACTION_UP:
+				if (done) {
+					
+					return true;
+				}
 				// Start tracking the dirty region.
 				resetDirtyRect(eventX, eventY);
 				Stroke stroke_move = _activeStrokes.get(id);
@@ -304,6 +327,7 @@ public class SignatureView extends View {
 						}
 						if (min_selected_fp != null){
 							min_selected_fp.toggle_select();
+							last_point = min_selected_fp;
 							_selectedStroke = closest_stroke;
 						}
 					}
