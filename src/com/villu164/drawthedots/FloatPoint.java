@@ -15,7 +15,6 @@ public class FloatPoint {
 		this.y = y;
 		if (selected > 0) {
 			select();
-			System.out.println("Setting: " + this.toString() + " to true");
 		}
 	}
 	
@@ -31,14 +30,12 @@ public class FloatPoint {
 
 	public boolean get_selected(){
 		if (selected) {
-			System.out.println("TRUETRUETRUE: " + this.toString());
 			return true;
 		}
 		return false;
 	}
 	public float get_selected_int(){
 		if (selected) {
-			System.out.println("TRUETRUETRUE: " + this.toString());
 			return (float)1.0;
 		}
 		return (float)0;

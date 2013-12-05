@@ -8,8 +8,9 @@
     <string name="next">Next</string>
     <string name="clear_all">Clear All</string>
     <string name="crash_toast_text">Oops, something went wrong!</string>
-    <string name="select">Select</string>
+    <string name="select">S</string>
     <string name="select_next">&gt;</string>
     <string name="select_previous">&lt;</string>
+    <string name="play">Try</string>
 
 </resources>

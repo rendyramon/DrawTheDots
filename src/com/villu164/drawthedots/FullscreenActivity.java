@@ -120,4 +120,8 @@ public class FullscreenActivity extends Activity {
 	public void nextStep(View view){
 		sig_view.make_dots(); //cannot use at the moment, because
 	}
+	
+	public void playGame(View view){
+		sig_view.toggle_play();
+	}
 }

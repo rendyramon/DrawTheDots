@@ -32,7 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_PATHS = "paths";
     private static final String TABLE_PATH_COLLECTIONS = "path_collections";
     
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
  
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
