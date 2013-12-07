@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -55,7 +56,7 @@ public class FullscreenActivity extends Activity {
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
 	private SystemUiHider mSystemUiHider;
-	
+
 	private SignatureView sig_view;
 	private DatabaseHandler db;
 
@@ -67,10 +68,10 @@ public class FullscreenActivity extends Activity {
 		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.felt2);
 		//Canvas canvas = new Canvas(bitmap);
 		sig_view = (SignatureView) findViewById(R.id.signatureView1);
-		
+
 		//final View controlsView = findViewById(R.id.fullscreen_content_controls);
 		final View contentView = findViewById(R.id.fullscreen_content);
-		
+
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
@@ -80,35 +81,68 @@ public class FullscreenActivity extends Activity {
 		//db.onUpgrade(db.getWritableDatabase(), 0, 1);
 		System.out.println(db.getPathsCount());
 	}
-	
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		//message(keyCode + "");
+		//t=48 d=32 space=62 backspace=67 
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_MENU:
+			/* Sample for handling the Menu button globally */
+			message("No menu :(");
+			return true;
+		case KeyEvent.KEYCODE_C:
+			sig_view.clear(true);
+			return true;
+		case KeyEvent.KEYCODE_D:
+			sig_view.toggle_debug();
+			return true;
+		case KeyEvent.KEYCODE_R:
+			sig_view.make_dots();
+			return true;
+		case KeyEvent.KEYCODE_T:
+			sig_view.toggle_play();
+			return true;
+		case KeyEvent.KEYCODE_SPACE:
+			sig_view.reset();
+			sig_view.select(0);
+			return true;
+		case KeyEvent.KEYCODE_DEL:
+			sig_view.clear();
+			return true;
+		}
+		
+		return false;
+	} 
+
 	public void message(String message){
 		message(message,false);
 	}
-	
+
 	public void message(String message, boolean long_message){
 		int message_length = Toast.LENGTH_SHORT;
 		if (long_message) message_length = Toast.LENGTH_LONG;
 		Toast.makeText(getApplicationContext(), message,message_length).show();
 	}
 
-	
+
 	public void clearAll(View view){
 		//R.id.signatureView1
-		
+
 		sig_view.clear(true);
 	}	
-	
+
 	public void clearLast(View view){
 		//R.id.signatureView1
-		
+
 		sig_view.clear();
 	}
-	
+
 	public void selectLast(View view){
 		sig_view.reset();
 		sig_view.select(0);
 	}
-	
+
 	public void selectNext(View view){
 		sig_view.select(1);
 	}
@@ -116,12 +150,13 @@ public class FullscreenActivity extends Activity {
 	public void selectPrevious(View view){
 		sig_view.select(-1);
 	}
-	
+
 	public void nextStep(View view){
 		sig_view.make_dots(); //cannot use at the moment, because
 	}
-	
+
 	public void playGame(View view){
 		sig_view.toggle_play();
 	}
+
 }
