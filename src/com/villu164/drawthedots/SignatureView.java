@@ -44,7 +44,6 @@ public class SignatureView extends View {
 	private FloatPoint moving_point = null;
 	private int progress_index = 1;
 
-
 	/**
 	 * Optimizes painting by invalidating the smallest possible area.
 	 */
@@ -75,7 +74,7 @@ public class SignatureView extends View {
 		debug = !debug;
 		invalidate();
 	}
-	
+
 	private void init_strokes(){
 		_allStrokes = new ArrayList<Stroke>();
 		_activeStrokes = new SparseArray<Stroke>();
@@ -184,6 +183,13 @@ public class SignatureView extends View {
 								if(_has_selection && _selectedStroke == stroke) canvas.drawPath(_selectedStroke.getPath(), selected_paint);
 								else {
 									if (line_count_index + 1 < progress_index && play_game) canvas.drawPath(path, painter);
+								}
+							}
+							else {
+								if (last_point != null) {
+									debug("PlayLineRegion");
+									Path play_path = stroke.getPathBeforeFloatPoint(last_point);
+									if (play_path != null && progress_index < line_count_index)	canvas.drawPath(play_path, selected_paint);
 								}
 							}
 							List<FloatPoint> points = stroke.getFloatPoints();

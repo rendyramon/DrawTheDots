@@ -3,10 +3,10 @@
 
     <string name="app_name">DrawTheDots</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="clear">Undo</string>
+    <string name="clear">U</string>
     <string name="screen_text"></string>
-    <string name="next">Next</string>
-    <string name="clear_all">Clear All</string>
+    <string name="next">R</string>
+    <string name="clear_all">X</string>
     <string name="crash_toast_text">Oops, something went wrong!</string>
     <string name="select">S</string>
     <string name="select_next">&gt;</string>

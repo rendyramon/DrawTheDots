@@ -71,6 +71,50 @@ public class Stroke {
     public Path getPath() {
         return _path;
     }
+    
+    void debug(String message){
+    	System.out.println(message);
+    }
+    
+    public Path getPathBeforeFloatPoint(FloatPoint fp){
+		Path path = new Path();
+		FloatPoint first_fp = _raw_path.get(0);
+		path.moveTo(first_fp.x, first_fp.y);	
+		for (FloatPoint line_fp: _raw_path) {
+			if (line_fp == fp) break;
+			if (line_fp.distance(fp) < 0.001) {
+				debug("Found matching fp");
+				break;
+			}
+			path.lineTo(line_fp.x, line_fp.y);	
+			debug("X:" + line_fp.x + ";Y:" + line_fp.y);
+        }
+		path.close();
+		
+		//
+		//	final Path path = new Path();
+		//	final Paint paint = new Paint();
+		//
+		//	paint.setColor(Color.RED);
+		//	paint.setAntiAlias(true);
+		//	paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		//
+		//	path.moveTo(100, 100);
+		//	path.lineTo(200, 100);
+		//	path.lineTo(200, 200);
+		//	path.lineTo(100, 200);
+		//	path.close();
+		//
+		//	path.moveTo(150, 150);
+		//	path.lineTo(180, 150);
+		//	path.lineTo(180, 180);
+		//	path.lineTo(150, 180);
+		//	path.close();
+		//
+		//	path.setFillType(Path.FillType.EVEN_ODD);
+		//	canvas.drawPath(path, paint);
+		return path;
+    }
 
     public Paint getPaint() {
         return _paint;
