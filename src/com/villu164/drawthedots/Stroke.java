@@ -82,14 +82,10 @@ public class Stroke {
 		path.moveTo(first_fp.x, first_fp.y);	
 		for (FloatPoint line_fp: _raw_path) {
 			if (line_fp == fp) break;
-			if (line_fp.distance(fp) < 0.001) {
-				debug("Found matching fp");
-				break;
-			}
+
 			path.lineTo(line_fp.x, line_fp.y);	
 			debug("X:" + line_fp.x + ";Y:" + line_fp.y);
         }
-		path.close();
 		
 		//
 		//	final Path path = new Path();
