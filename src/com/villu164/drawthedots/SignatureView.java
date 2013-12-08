@@ -26,10 +26,12 @@ public class SignatureView extends View {
 
 	private List<Stroke> _allStrokes; //all strokes that need to be drawn
 	private List<FloatPoint> _selectedFPs; //all strokes that need to be drawn
+	private boolean _selectedFPs_valid = false;
 	private SparseArray<Stroke> _activeStrokes; //use to retrieve the currently drawn strokes
 	private Stroke _selectedStroke = null;
 	private boolean _has_selection = false;
 	private Random _rdmColor = new Random();
+	private Path play_path;
 
 	private Paint selected_paint = new Paint();
 	private Paint selected_point_paint = new Paint();
@@ -44,6 +46,7 @@ public class SignatureView extends View {
 	private FloatPoint last_point = null;
 	private FloatPoint moving_point = null;
 	private int progress_index = 1;
+	private int invalidates_called = 0;
 
 	/**
 	 * Optimizes painting by invalidating the smallest possible area.
@@ -188,7 +191,7 @@ public class SignatureView extends View {
 		int count_index = 1;
 		int line_count_index = 1;
 		int total_selected_count = 0;
-		_selectedFPs = new ArrayList<FloatPoint>();
+		
 		boolean choose = true;
 		boolean draw_enabled = true;
 		if (choose) {
@@ -202,16 +205,14 @@ public class SignatureView extends View {
 							if (!play_game) {
 								if(_has_selection && _selectedStroke == stroke) canvas.drawPath(_selectedStroke.getPath(), selected_paint);
 								else {
-									if (line_count_index + 1 < progress_index && play_game) canvas.drawPath(path, painter);
+									canvas.drawPath(path, painter);
 								}
 							}
-							else {
 
-							}
 							List<FloatPoint> points = stroke.getFloatPoints();
 							if (points == null) continue;
 							boolean play_path_has_fps = false;
-							Path play_path = new Path();
+							play_path = new Path();
 							for (FloatPoint fp: points) {
 								//Here begins the first loop for the points -> lets try to do everything here
 								if (draw_enabled) {
@@ -224,8 +225,8 @@ public class SignatureView extends View {
 									}
 								}
 								if (fp.get_selected()) {
-									_selectedFPs.add(fp);
-									
+									if (!_selectedFPs_valid) _selectedFPs.add(fp);
+
 									line_count_index++;
 									if (fp == last_point) draw_enabled = false;
 								}
@@ -241,7 +242,7 @@ public class SignatureView extends View {
 
 								}
 							}
-
+							
 
 							//Play path draw
 							if (play_game && play_path_has_fps) canvas.drawPath(play_path, selected_paint);
@@ -251,15 +252,14 @@ public class SignatureView extends View {
 							if (count_index == 1 && play_game){ //this is the draggable line visible when connecting the dots
 								if (last_point != null && moving_point != null) canvas.drawLine(last_point.x, last_point.y, moving_point.x, moving_point.y, deselected_point_paint);
 							}
-							for (FloatPoint fp: points) {
-								if (fp.get_selected()) {
-									if (last_point == null && count_index == 1){
-										last_point = fp;
+							if (!play_game) {
+								for (FloatPoint fp: points) {
+
+									if (fp.get_selected()) {
+										canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
 									}
-
-									canvas.drawCircle(fp.x, fp.y, 3, selected_point_paint);
-									if(_has_selection) {
-
+									else {
+										canvas.drawCircle(fp.x, fp.y, 3, deselected_point_paint);
 									}
 								}
 							}
@@ -267,7 +267,7 @@ public class SignatureView extends View {
 					}
 				}
 			}
-
+			_selectedFPs_valid = true;
 			//loop through the selected dots
 			int selected_points_counter = 0;
 			if (_has_selection) {
@@ -275,7 +275,7 @@ public class SignatureView extends View {
 					if (moving_point != null){
 						float dist = moving_point.distance(fp, FINGER_WIDTH);
 						if (dist > 0 && progress_index == selected_points_counter) {
-							moving_point = fp;
+							moving_point = fp; //moving point is here to help draw the live-line
 							last_point = moving_point;
 							moving_point = null;
 							progress_index = selected_points_counter;
@@ -301,7 +301,7 @@ public class SignatureView extends View {
 		}
 		//else {canvas.drawPath(path, paint);}
 		//canvas.drawText(progress_index + ";" + line_count_index + ";" + count_index, 50,50, debug_text);
-		if (debug) canvas.drawText("play:" + play_game + ";select:" + _has_selection + " " + progress_index + ";" + line_count_index + ";" + count_index, 0,debug_text.getTextSize(), debug_text);
+		if (debug) canvas.drawText("play:" + play_game + ";select:" + _has_selection + " " + progress_index + ";" + line_count_index + ";" + count_index + "; invalidates_called=" + invalidates_called, 0,debug_text.getTextSize(), debug_text);
 		//if (debug) test1(canvas,selected_paint);
 	}
 
@@ -318,9 +318,11 @@ public class SignatureView extends View {
 
 
 		switch(action){
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_UP:
 			//message("Cannot draw, selection is active!");
 			//_selectedStroke.getSelectedPoints().add(new FloatPoint(eventX,eventY));
+			_selectedFPs_valid = false;
+			_selectedFPs = new ArrayList<FloatPoint>();
 			FloatPoint touch_down_fp = new FloatPoint(eventX,eventY,false);
 			FloatPoint nearest = _selectedStroke.nearestPoint(touch_down_fp,FINGER_WIDTH);
 			if (nearest != null) nearest.toggle_select();
@@ -350,8 +352,12 @@ public class SignatureView extends View {
 					}
 					if (min_selected_fp != null){
 						min_selected_fp.toggle_select();
+						
 						//last_point = min_selected_fp;
 						_selectedStroke = closest_stroke;
+						invalidate();
+						return true;
+						//invalidate();
 					}
 				}
 				//if (nearest == null) _has_selection = false;
@@ -363,7 +369,7 @@ public class SignatureView extends View {
 			invalidate();
 			break;
 		}
-
+		invalidate();
 		return true;
 	}
 
@@ -425,11 +431,6 @@ public class SignatureView extends View {
 			lastTouchX = eventX;
 			lastTouchY = eventY;
 
-			if (play_game) {
-				//last_point = new FloatPoint(eventX,eventY,false);
-				return true;
-			}
-
 			//create a paint with random color
 			Paint paint_rnd = new Paint();
 			paint_rnd.setStyle(Paint.Style.STROKE);
@@ -453,10 +454,7 @@ public class SignatureView extends View {
 				return true;
 			}
 		case MotionEvent.ACTION_UP:
-			if (play_game) {
 
-				return true;
-			}
 			// Start tracking the dirty region.
 			resetDirtyRect(eventX, eventY);
 			Stroke stroke_move = _activeStrokes.get(id);
