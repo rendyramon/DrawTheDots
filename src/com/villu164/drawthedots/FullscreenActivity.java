@@ -1,16 +1,21 @@
 package com.villu164.drawthedots;
 
 
+import java.util.Calendar;
+
 import com.villu164.drawthedots.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +64,11 @@ public class FullscreenActivity extends Activity {
 
 	private SignatureView sig_view;
 	private DatabaseHandler db;
+	long starting_time = System.currentTimeMillis();
+	int last_key = 0;
+	float ALLOWED_DOUBLE_PRESS = (float)500.0;
+	boolean toggle_keyboard = false;
+	private View contentView = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +80,7 @@ public class FullscreenActivity extends Activity {
 		sig_view = (SignatureView) findViewById(R.id.signatureView1);
 
 		//final View controlsView = findViewById(R.id.fullscreen_content_controls);
-		final View contentView = findViewById(R.id.fullscreen_content);
-
+		contentView = findViewById(R.id.fullscreen_content);
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
@@ -82,14 +91,46 @@ public class FullscreenActivity extends Activity {
 		System.out.println(db.getPathsCount());
 	}
 
+	private long get_time(){
+		return System.currentTimeMillis();
+	}
+
+	private boolean was_double(int key_code){
+		long now = get_time();
+		boolean match = (last_key == key_code && (now - starting_time) < ALLOWED_DOUBLE_PRESS);
+		last_key = key_code;
+		starting_time = now;
+		if (match) last_key = 0;
+		return match;
+	}
+
+
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		//message(keyCode + "");
-		//t=48 d=32 space=62 backspace=67 
+	public boolean onKeyUp( int keyCode, KeyEvent event ) {
+		boolean double_press = was_double(keyCode);
 		switch (keyCode) {
+		case KeyEvent.KEYCODE_BACK:
+			if (double_press) exit();
+			else message("DoubleTap to exit :D");
+			return true;
 		case KeyEvent.KEYCODE_MENU:
+			if (double_press) {
+				toggle_keyboard = false;
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(contentView.getWindowToken(),0); 
+			}
+			else {
+				if (toggle_keyboard){
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(contentView.getWindowToken(),0); 
+				}
+				else {
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+				}
+			}
 			/* Sample for handling the Menu button globally */
-			message("No menu :(");
+			//message("No menu :(");
 			return true;
 		case KeyEvent.KEYCODE_C:
 			sig_view.clear(true);
@@ -111,9 +152,18 @@ public class FullscreenActivity extends Activity {
 			sig_view.clear();
 			return true;
 		}
-		
-		return false;
-	} 
+
+		return super.onKeyUp( keyCode, event );
+	}
+
+	public void exit(){
+		finish();
+		//
+		//Anyway if your app consist of only 1 activity you should call finish();
+		//int pid = android.os.Process.myPid();
+		//android.os.Process.killProcess(pid);
+		//
+	}
 
 	public void message(String message){
 		message(message,false);

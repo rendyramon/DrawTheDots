@@ -81,6 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:onClick="selectPrevious"
+            android:visibility="gone"
             android:text="@string/select_previous" />
         
         <Button
@@ -100,6 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:onClick="selectNext"
+            android:visibility="gone"
             android:text="@string/select_next" />
         
          <Button
