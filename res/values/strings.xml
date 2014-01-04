@@ -12,5 +12,15 @@
     <string name="select_next">&gt;</string>
     <string name="select_previous">&lt;</string>
     <string name="play">Try</string>
+    <string name="title_activity_edit_drawing">EditDrawing</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="filename">Filename</string>
+    <string name="open">Open</string>
+    <string name="search">Search</string>
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
 
 </resources>

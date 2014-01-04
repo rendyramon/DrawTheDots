@@ -74,7 +74,7 @@ public class FullscreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fullscreen);
-
+		final View controlsView = findViewById(R.id.fullscreen_content_controls);
 		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.felt2);
 		//Canvas canvas = new Canvas(bitmap);
 		sig_view = (SignatureView) findViewById(R.id.signatureView1);
@@ -88,7 +88,62 @@ public class FullscreenActivity extends Activity {
 		sig_view.init_db(db);
 		sig_view.init_parent(this);
 		//db.onUpgrade(db.getWritableDatabase(), 0, 1);
-		System.out.println(db.getPathsCount());
+		//System.out.println(db.getPathsCount());
+		
+		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
+				HIDER_FLAGS);
+		mSystemUiHider.setup();
+		mSystemUiHider
+				.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
+					// Cached values.
+					int mControlsHeight;
+					int mShortAnimTime;
+
+					@Override
+					@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+					public void onVisibilityChange(boolean visible) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+							// If the ViewPropertyAnimator API is available
+							// (Honeycomb MR2 and later), use it to animate the
+							// in-layout UI controls at the bottom of the
+							// screen.
+							if (mControlsHeight == 0) {
+								mControlsHeight = controlsView.getHeight();
+							}
+							if (mShortAnimTime == 0) {
+								mShortAnimTime = getResources().getInteger(
+										android.R.integer.config_shortAnimTime);
+							}
+							controlsView
+									.animate()
+									.translationY(visible ? 0 : mControlsHeight)
+									.setDuration(mShortAnimTime);
+						} else {
+							// If the ViewPropertyAnimator APIs aren't
+							// available, simply show or hide the in-layout UI
+							// controls.
+							controlsView.setVisibility(visible ? View.VISIBLE
+									: View.GONE);
+						}
+
+						if (visible && AUTO_HIDE) {
+							// Schedule a hide().
+							delayedHide(AUTO_HIDE_DELAY_MILLIS);
+						}
+					}
+				});
+		mSystemUiHider.hide();
+		// Set up the user interaction to manually show or hide the system UI.
+		contentView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (TOGGLE_ON_CLICK) {
+					mSystemUiHider.toggle();
+				} else {
+					mSystemUiHider.show();
+				}
+			}
+		});
 	}
 
 	private long get_time(){
@@ -115,18 +170,19 @@ public class FullscreenActivity extends Activity {
 			return true;
 		case KeyEvent.KEYCODE_MENU:
 			if (double_press) {
-				toggle_keyboard = false;
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(contentView.getWindowToken(),0); 
+				toggleKeyboard();
 			}
 			else {
 				if (toggle_keyboard){
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(contentView.getWindowToken(),0); 
+					toggle_keyboard = !toggle_keyboard;
+					toggleKeyboard(false);
 				}
 				else {
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+					if (TOGGLE_ON_CLICK) {
+						mSystemUiHider.toggle();
+					} else {
+						mSystemUiHider.show();
+					}
 				}
 			}
 			/* Sample for handling the Menu button globally */
@@ -151,11 +207,35 @@ public class FullscreenActivity extends Activity {
 		case KeyEvent.KEYCODE_DEL:
 			sig_view.clear();
 			return true;
+		case KeyEvent.KEYCODE_F:
+			Intent intent = new Intent(this, EditDrawingActivity.class);
+		    //EditText editText = (EditText) findViewById(R.id.edit_message);
+		    //String message = editText.getText().toString();
+		    //intent.putExtra(EXTRA_MESSAGE, message);
+		    startActivity(intent);
+		    return true;
 		}
 
 		return super.onKeyUp( keyCode, event );
 	}
 
+	public void toggleKeyboard(){
+		toggleKeyboard(toggle_keyboard);
+		toggle_keyboard = !toggle_keyboard;
+	}
+	
+	public void toggleKeyboard(boolean show){
+		if (show){
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(contentView.getWindowToken(),0); 
+		}
+		else {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+		}
+	}
+	
+	
 	public void exit(){
 		finish();
 		//
@@ -167,6 +247,7 @@ public class FullscreenActivity extends Activity {
 
 	public void message(String message){
 		message(message,false);
+		int i = 2;
 	}
 
 	public void message(String message, boolean long_message){
@@ -175,6 +256,24 @@ public class FullscreenActivity extends Activity {
 		Toast.makeText(getApplicationContext(), message,message_length).show();
 	}
 
+	Handler mHideHandler = new Handler();
+	Runnable mHideRunnable = new Runnable() {
+		@Override
+		public void run() {
+			mSystemUiHider.hide();
+		}
+	};
+
+	
+
+	/**
+	 * Schedules a call to hide() in [delay] milliseconds, canceling any
+	 * previously scheduled calls.
+	 */
+	private void delayedHide(int delayMillis) {
+		mHideHandler.removeCallbacks(mHideRunnable);
+		mHideHandler.postDelayed(mHideRunnable, delayMillis);
+	}
 
 	public void clearAll(View view){
 		//R.id.signatureView1

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
-    tools:context=".FullscreenActivity" >
+    tools:context=".EditDrawingActivity" >
 
     <!--
          The primary full-screen view. This can be replaced with whatever view
@@ -17,7 +17,6 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="@string/screen_text"
         android:textColor="#33b5e5"
         android:textSize="50sp"
         android:textStyle="bold" />
@@ -32,91 +31,6 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true" >
 
-
-        <com.villu164.drawthedots.SignatureView
-            android:id="@+id/signatureView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_height="match_parent" >
-            
-            
-            
-        <Button
-            android:id="@+id/clear_screen"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="clearAll"
-            android:text="@string/clear_all" />
-
-        <Button
-            android:id="@+id/clear_one"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="clearLast"
-            android:text="@string/clear" />
-        
-        <Button
-            android:id="@+id/next"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="nextStep"
-            android:visibility="visible"
-            android:text="@string/next" />
-        
-        <Button
-            android:id="@+id/previous_path"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="selectPrevious"
-            android:visibility="gone"
-            android:text="@string/select_previous" />
-        
-        <Button
-            android:id="@+id/select"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="selectLast"
-            android:text="@string/select" />
-            
-        
-        <Button
-            android:id="@+id/next_path"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="selectNext"
-            android:visibility="gone"
-            android:text="@string/select_next" />
-        
-         <Button
-            android:id="@+id/play_game"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="playGame"
-            android:text="@string/play" />
-        
-        
-        </LinearLayout>
-
-        
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
             style="?buttonBarStyle"
